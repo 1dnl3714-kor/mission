@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>반석이네 가족 여행 미션</title>
+
+<!-- iOS 웹앱 -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="가족 여행" />
+<link rel="apple-touch-icon" href="icon.png" />
+<meta name="theme-color" content="#ff6aa3" />
+
+<style>
+  :root{
+    --bg-grad: linear-gradient(135deg, #ff8ab5, #ff6aa3 38%, #a02ede);
+    --accent-grad: linear-gradient(90deg, #ff6aa3, #ffb0d4); /* 진행률/포인트 */
+    --btn-grad: linear-gradient(90deg, #ff6aa3, #ff2d6f);    /* 버튼 */
+    --ink:#0b1324; --muted:#6b7280;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg-grad) fixed; color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Noto Sans KR",system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+  }
+  .navbar{padding:22px 20px 6px; text-align:center; font-size:28px; font-weight:900; letter-spacing:-.2px}
+  .subtitle{text-align:center; font-size:15px; color:#ffe6f1; margin:2px 0 20px}
+  .container{max-width:920px;margin:0 auto; padding:20px;}
+  .card{background:rgba(255,255,255,.96); color:#1f2937; border-radius:20px; padding:18px; margin-bottom:16px; box-shadow:0 12px 30px rgba(0,0,0,.10)}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .sec-title{font-weight:900; font-size:18px; margin:2px 0 10px; letter-spacing:-.2px}
+  .label{font-size:14px; color:#4b5563; margin-bottom:6px}
+  .pill{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:14px; background:#fff; border:1px solid #f2d0de; font-weight:700; font-size:16px}
+  .static{font-size:16px; font-weight:800; color:#111827}
+  input, textarea{flex:1; padding:12px 14px; border:none; border-radius:14px; font-size:16px; outline:none; background:#fff; box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+  textarea{min-height:96px; resize:vertical}
+  button{border:none; padding:12px 18px; border-radius:14px; font-weight:800; font-size:16px; cursor:pointer}
+  .btn-primary{background:var(--btn-grad); color:#fff; box-shadow:0 10px 22px rgba(255,106,163,.25)}
+  .btn-ghost{background:#ffe6f1; color:#b3124a;}
+  .progress{margin-top:10px}
+  .progress .bar{height:12px; border-radius:999px; background:#ffe6f1; overflow:hidden; border:1px solid #ffd3e5}
+  .progress .bar>i{display:block; height:100%; background:var(--accent-grad); width:0%; transition:width .25s ease;}
+  small.hint{color:#6b7280}
+  .row{display:flex; gap:10px; align-items:center}
+  @media (max-width:720px){ .grid2{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+  <div class="navbar">반석이네 가족 여행</div>
+  <div class="subtitle">오키나와 🇯🇵 · 방콕 🇹🇭 — 온라인/오프라인 저장 & 동기화</div>
+
+  <div class="container">
+    <!-- 고정 정보 (아이폰 스타일 Pill) -->
+    <div class="card">
+      <div class="sec-title">기본 정보</div>
+      <div class="grid2">
+        <div>
+          <div class="label">이름</div>
+          <div class="pill">👧 <span class="static" id="nameStatic">권유빈</span></div>
+        </div>
+        <div>
+          <div class="label">여행 날짜</div>
+          <div class="pill">📆 <span class="static" id="datesStatic">8월23~8월 30</span></div>
+        </div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <button id="saveHeader" class="btn-primary">확인(저장)</button>
+        <small class="hint" id="saveStatus"></small>
+      </div>
+      <div class="progress">
+        <div class="bar"><i id="overallBar"></i></div>
+      </div>
+    </div>
+
+    <!-- 1. 환율 -->
+    <div class="card">
+      <div class="sec-title">1) 환율 계산 퀴즈</div>
+      <div class="grid2">
+        <input id="fxJPY" placeholder="10,000원 → ■ 엔 (JPY)"/>
+        <input id="fxTHB" placeholder="10,000원 → ■ 바트 (THB)"/>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input id="fxBonus" placeholder="보너스: 500엔 ≈ ■ 바트"/>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <input id="fxStarKRW" placeholder="⭐ 추가문제: 500바트는 한국돈으로? (￦)"/>
+      </div>
+      <button class="btn-primary" data-sec="1" style="margin-top:10px">확정(저장)</button>
+    </div>
+
+    <!-- 2. 전기 -->
+    <div class="card">
+      <div class="sec-title">2) 전기 플러그 & 전압</div>
+      <div class="grid2">
+        <input id="plugJP" placeholder="일본: 플러그 타입 / 전압"/>
+        <input id="plugTH" placeholder="태국: 플러그 타입 / 전압"/>
+      </div>
+      <div class="row" style="margin-top:10px"><input id="plugMe" placeholder="내 충전기 호환 여부(예: 100–240V)"/></div>
+      <button class="btn-primary" data-sec="2" style="margin-top:10px">확정(저장)</button>
+    </div>
+
+    <!-- 3. 날씨 & 옷차림 -->
+    <div class="card">
+      <div class="sec-title">3) 날씨 & 옷차림</div>
+      <div class="grid2">
+        <input id="wxOKA" placeholder="오키나와: 최저/최고/강수"/>
+        <input id="wxBKK" placeholder="방콕: 최저/최고/강수"/>
+      </div>
+      <div class="row" style="margin-top:10px"><textarea id="outfit" placeholder="옷차림/아이템 (반팔, 가디건, 슬리퍼, 우산, 모자, 선크림 등)"></textarea></div>
+      <button class="btn-primary" data-sec="3" style="margin-top:10px">확정(저장)</button>
+    </div>
+
+    <!-- 4. 회화 -->
+    <div class="card">
+      <div class="sec-title">4) 간단 회화 카드</div>
+      <div class="row"><textarea id="jpPhrases" placeholder="일본어 메모 (감사합니다 / 얼마예요? / 맛있어요 + 발음)"></textarea></div>
+      <div class="row" style="margin-top:10px"><textarea id="thPhrases" placeholder="태국어 메모 (감사합니다 / 얼마예요? / 맛있어요 + 발음)"></textarea></div>
+      <button class="btn-primary" data-sec="4" style="margin-top:10px">확정(저장)</button>
+    </div>
+
+    <!-- 5. 편의점 -->
+    <div class="card">
+      <div class="sec-title">5) 편의점 필수템</div>
+      <div class="row"><textarea id="cOKA" placeholder="오키나와 편의점 베스트 3 + 가격"></textarea></div>
+      <div class="row" style="margin-top:10px"><textarea id="cBKK" placeholder="방콕 편의점 베스트 3 + 가격"></textarea></div>
+      <button class="btn-primary" data-sec="5" style="margin-top:10px">확정(저장)</button>
+    </div>
+  </div>
+
+  <!-- Firebase (Compat CDN) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <script>
+    // Firebase 초기화 (질문 주신 설정 사용) — Firestore + 오프라인 캐시
+    const firebaseConfig = {
+      apiKey: "AIzaSyBu2rTUwtREkmXicazOXq9D7I6uBQOz87U",
+      authDomain: "my-memo-90e91.firebaseapp.com",
+      projectId: "my-memo-90e91",
+      storageBucket: "my-memo-90e91.firebasestorage.app",
+      messagingSenderId: "752429576474",
+      appId: "1:752429576474:web:2afc83b95a8af5110c7ca3"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    db.enablePersistence({ synchronizeTabs: true }).catch(()=>{}); // 사파리 프라이빗 모드 등 실패 가능
+
+    // DOM
+    const $ = id => document.getElementById(id);
+    const bar = $('overallBar');
+    const statusNote = $('saveStatus');
+
+    // 고정 값(헤더)
+    const FIXED_NAME = '권유빈';
+    const FIXED_DATES = '8월23~8월 30';
+
+    let uid = null; let docRef = null;
+
+    function updateProgress(){
+      const checks = [
+        true, // 고정 헤더는 항상 충족
+        $('fxJPY').value && $('fxTHB').value,
+        $('plugJP').value && $('plugTH').value && $('plugMe').value,
+        $('wxOKA').value && $('wxBKK').value && $('outfit').value,
+        $('jpPhrases').value && $('thPhrases').value,
+        $('cOKA').value && $('cBKK').value
+      ];
+      const pct = Math.round(checks.filter(Boolean).length / checks.length * 100);
+      bar.style.width = pct + '%';
+    }
+
+    async function saveMerge(obj){
+      if(!docRef) throw new Error('로그인 전');
+      await docRef.set(obj, { merge:true });
+      statusNote.textContent = '저장됨 ✓';
+      setTimeout(()=> statusNote.textContent = '', 1000);
+    }
+
+    function bindSectionButtons(){
+      document.querySelectorAll('button[data-sec]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const sec = Number(btn.dataset.sec);
+          try{
+            if(sec===1) await saveMerge({
+              header:{name:FIXED_NAME, dates:FIXED_DATES},
+              sec1:{fxJPY:$('fxJPY').value.trim(), fxTHB:$('fxTHB').value.trim(), fxBonus:$('fxBonus').value.trim(), fxStarKRW:$('fxStarKRW').value.trim()},
+              updatedAt:Date.now()
+            });
+            if(sec===2) await saveMerge({
+              header:{name:FIXED_NAME, dates:FIXED_DATES},
+              sec2:{plugJP:$('plugJP').value.trim(), plugTH:$('plugTH').value.trim(), plugMe:$('plugMe').value.trim()},
+              updatedAt:Date.now()
+            });
+            if(sec===3) await saveMerge({
+              header:{name:FIXED_NAME, dates:FIXED_DATES},
+              sec3:{wxOKA:$('wxOKA').value.trim(), wxBKK:$('wxBKK').value.trim(), outfit:$('outfit').value.trim()},
+              updatedAt:Date.now()
+            });
+            if(sec===4) await saveMerge({
+              header:{name:FIXED_NAME, dates:FIXED_DATES},
+              sec4:{jpPhrases:$('jpPhrases').value.trim(), thPhrases:$('thPhrases').value.trim()},
+              updatedAt:Date.now()
+            });
+            if(sec===5) await saveMerge({
+              header:{name:FIXED_NAME, dates:FIXED_DATES},
+              sec5:{cOKA:$('cOKA').value.trim(), cBKK:$('cBKK').value.trim()},
+              updatedAt:Date.now()
+            });
+          }catch(e){ alert('저장 오류: '+(e?.message||e)); }
+        });
+      });
+    }
+
+    function hydrate(data){
+      if(!data) return;
+      // 헤더(고정 표기)
+      $('nameStatic').textContent = FIXED_NAME;
+      $('datesStatic').textContent = FIXED_DATES;
+      // sec1
+      if(data.sec1?.fxJPY) $('fxJPY').value = data.sec1.fxJPY;
+      if(data.sec1?.fxTHB) $('fxTHB').value = data.sec1.fxTHB;
+      if(data.sec1?.fxBonus) $('fxBonus').value = data.sec1.fxBonus;
+      if(data.sec1?.fxStarKRW) $('fxStarKRW').value = data.sec1.fxStarKRW;
+      // sec2
+      if(data.sec2?.plugJP) $('plugJP').value = data.sec2.plugJP;
+      if(data.sec2?.plugTH) $('plugTH').value = data.sec2.plugTH;
+      if(data.sec2?.plugMe) $('plugMe').value = data.sec2.plugMe;
+      // sec3
+      if(data.sec3?.wxOKA) $('wxOKA').value = data.sec3.wxOKA;
+      if(data.sec3?.wxBKK) $('wxBKK').value = data.sec3.wxBKK;
+      if(data.sec3?.outfit) $('outfit').value = data.sec3.outfit;
+      // sec4
+      if(data.sec4?.jpPhrases) $('jpPhrases').value = data.sec4.jpPhrases;
+      if(data.sec4?.thPhrases) $('thPhrases').value = data.sec4.thPhrases;
+      // sec5
+      if(data.sec5?.cOKA) $('cOKA').value = data.sec5.cOKA;
+      if(data.sec5?.cBKK) $('cBKK').value = data.sec5.cBKK;
+
+      updateProgress();
+    }
+
+    // 헤더 저장(고정값 저장)
+    document.getElementById('saveHeader').addEventListener('click', async ()=>{
+      try{ await saveMerge({header:{name:FIXED_NAME, dates:FIXED_DATES}, updatedAt:Date.now()}); }
+      catch(e){ alert('저장 오류: '+(e?.message||e)); }
+    });
+
+    document.querySelectorAll('input, textarea').forEach(el=> el.addEventListener('input', updateProgress));
+
+    (async function start(){
+      try{
+        const cred = await auth.signInAnonymously();
+        const uid = cred.user.uid;
+        const docPath = firebase.firestore().collection('users').doc(uid).collection('pretrip').doc('data');
+        docRef = docPath;
+        docRef.onSnapshot(snap => hydrate(snap.data()));
+        bindSectionButtons();
+      }catch(e){ alert('초기화 오류: '+(e?.message||e)); }
+    })();
+
+    // 오프라인 로딩용 서비스 워커 등록 (sw.js가 같은 폴더에 있어야 함)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(()=>{});
+      });
+    }
+  </script>
+</body>
+</html>
