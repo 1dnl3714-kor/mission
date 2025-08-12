@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>반석이네 가족 여행 미션</title>
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="가족 여행" />
+<meta name="theme-color" content="#ff6aa3" />
+<style>
+  :root{
+    --bg-grad: linear-gradient(135deg, #ff8ab5, #ff6aa3 40%, #a02ede);
+    --accent-grad: linear-gradient(90deg, #ff6aa3, #ffb0d4);
+    --btn-grad: linear-gradient(90deg, #ff6aa3, #ffb0d4);
+  }
+  body{
+    margin:0; font-family:-apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Noto Sans KR", sans-serif;
+    background:var(--bg-grad) fixed; color:#fff; padding-top:env(safe-area-inset-top); padding-bottom:env(safe-area-inset-bottom);
+  }
+  .navbar{padding:20px; text-align:center; font-size:26px; font-weight:800;}
+  .subtitle{text-align:center; font-size:14px; color:#ffe6f1; margin-bottom:20px;}
+  .container{max-width:900px;margin:0 auto; padding:20px;}
+  .card{background:rgba(255,255,255,.9); color:#333; border-radius:18px; padding:16px; margin-bottom:16px;}
+  .field{display:flex; gap:8px; margin-bottom:10px;}
+  input, textarea{flex:1; padding:12px; border:none; border-radius:12px; font-size:16px;}
+  button{border:none; padding:12px 18px; border-radius:12px; font-weight:700; font-size:15px; cursor:pointer;}
+  .btn-primary{background:var(--btn-grad); color:#fff;}
+  .progress .bar{height:12px; border-radius:999px; background:#ffe6f1; overflow:hidden;}
+  .progress .bar>i{display:block; height:100%; background:var(--accent-grad); width:0%; transition:width .25s ease;}
+</style>
+</head>
+<body>
+<div class="navbar">반석이네 가족 여행</div>
+<div class="subtitle">오키나와 🇯🇵 · 방콕 🇹🇭 — 입력 후 확정하면 저장돼요</div>
+<div class="container">
+  <div class="card">
+    <div class="field"><input id="name" placeholder="여행자 이름 (예: 유빈)"/></div>
+    <div class="field"><input id="dates" placeholder="여행 날짜 (예: 8/23~8/30)"/></div>
+    <button id="saveHeader" class="btn-primary">확인(저장)</button>
+    <div class="progress"><div class="bar"><i id="overallBar"></i></div></div>
+  </div>
+</div>
+<script>
+  const byId = id=>document.getElementById(id);
+  const state={name:'',dates:''};
+  const KEY='trip-data';
+  function load(){const raw=localStorage.getItem(KEY); if(raw) Object.assign(state,JSON.parse(raw));}
+  function save(){localStorage.setItem(KEY, JSON.stringify(state));}
+  function fill(){if(state.name)byId('name').value=state.name; if(state.dates)byId('dates').value=state.dates;}
+  function updateProgress(p){byId('overallBar').style.width=p+'%';}
+  byId('saveHeader').addEventListener('click',()=>{state.name=byId('name').value; state.dates=byId('dates').value; save(); updateProgress(20);});
+  load(); fill();
+</script>
+</body>
+</html>
