@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>유빈이  가족 여행 미션</title>
+
+<!-- iOS 웹앱 설정 -->
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="가족 여행" />
+<link rel="apple-touch-icon" href="icon.png" />
+<meta name="theme-color" content="#ffb3c9" />
+
+<style>
+  :root{
+    --bg-grad: radial-gradient(1200px 800px at 20% -10%, rgba(255,210,230,.65), transparent 60%),
+               radial-gradient(1000px 700px at 110% 110%, rgba(255,235,200,.35), transparent 58%),
+               linear-gradient(135deg, #ffe1eb, #ffc6d9 45%, #ffb3c9 70%, #f8a6d1 100%);
+    --card-bg: rgba(255,255,255,.94);
+    --text: #242424;
+    --muted: #6b6b6b;
+    --accent-grad: linear-gradient(90deg, #ff6aa3, #ffb0d4);
+    --btn-grad: linear-gradient(90deg, #ff6aa3, #ff2d6f);
+    --chip-bg: rgba(255,255,255,.7);
+    --chip-text: #a0225a;
+    --radius: 18px;
+    --dock-h: 72px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg-grad) fixed; color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Noto Sans KR",system-ui,sans-serif;
+    letter-spacing:.1px;
+    padding-top:calc(env(safe-area-inset-top));
+    padding-bottom:calc(var(--dock-h) + env(safe-area-inset-bottom) + 12px);
+  }
+
+  /* 타이틀 가독성 향상 */
+  .title-wrap{position:sticky;top:0;z-index:5;padding-top:calc(env(safe-area-inset-top));}
+  .navbar{
+    padding:20px 20px 6px;
+    font-size:30px; font-weight:900; text-align:center; color:#fff;
+    text-shadow:0 2px 6px rgba(0,0,0,.25), 0 0 1px rgba(0,0,0,.35);
+    -webkit-text-stroke: .6px rgba(0,0,0,.15);
+  }
+  .subtitle{
+    text-align:center; font-size:14px; font-weight:800; letter-spacing:.1px; color:#ffffff;
+    margin:0 auto 14px; padding:8px 14px; width:max-content; max-width:calc(100% - 32px);
+    background:rgba(0,0,0,.18); border-radius:999px;
+    box-shadow:0 2px 8px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    backdrop-filter:saturate(1.2) blur(6px);
+  }
+
+  /* 프로필 헤더 */
+  .profile{max-width:980px; margin:0 auto 10px; padding:0 16px;}
+  .profile-card{position:relative; background:linear-gradient(180deg, rgba(255,255,255,.35), rgba(255,255,255,.18)); border-radius:28px; overflow:hidden; box-shadow:0 14px 30px rgba(0,0,0,.08); backdrop-filter: blur(10px);} 
+  .profile-cover{height:140px; background:radial-gradient(500px 240px at 10% 0%, rgba(255,210,230,.55), transparent 60%), radial-gradient(420px 240px at 95% 100%, rgba(255,235,200,.45), transparent 55%), linear-gradient(135deg, #ffd7e6, #ffbfd7 45%, #ffb3c9 80%, #f7a2cf 100%);} 
+  .profile-row{display:flex; align-items:center; gap:14px; padding:0 16px 16px; margin-top:-42px;} 
+  /* 아바타: P.PNG 우선, 없으면 icon.png */
+  .avatar{width:96px; height:96px; border-radius:28px; background:#fff url('P.png'), #fff url('icon.png'); background-position:center; background-size:cover; background-repeat:no-repeat; box-shadow:0 8px 24px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.7); border:4px solid rgba(255,255,255,.85); flex:0 0 auto;}
+  .pmeta{color:#2c2c2c;} .pname{font-size:22px; font-weight:900; letter-spacing:.2px;} .pdesc{margin-top:4px; color:#7a2a52; font-weight:700;}
+  .ptags{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;} .ptag{background:var(--chip-bg); color:var(--chip-text); padding:6px 10px; border-radius:999px; font-weight:700; font-size:13px; backdrop-filter: blur(6px); box-shadow:0 1px 0 rgba(255,255,255,.6) inset, 0 6px 16px rgba(0,0,0,.05);} 
+
+  .container{max-width:900px;margin:0 auto; padding:16px 16px 24px;}
+  .card{background:var(--card-bg); color:var(--text); border-radius:var(--radius); padding:16px; margin-bottom:14px; box-shadow:0 10px 28px rgba(0,0,0,.06);} 
+  .sec-title{font-weight:800; margin:4px 0 12px; font-size:18px; display:flex; align-items:center; gap:8px} .sec-title .ico{font-size:18px}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px} @media (max-width:720px){ .row2{grid-template-columns:1fr} }
+  .field{display:flex; gap:8px; margin-bottom:10px;}
+  input, textarea{flex:1; padding:13px 14px; border:none; border-radius:14px; font-size:16px; outline:none; background:#fff; line-height:1.35; color:var(--text); box-shadow: inset 0 0 0 1px rgba(0,0,0,.06), 0 1px 0 rgba(255,255,255,.9);} 
+  textarea{min-height:96px; resize:vertical}
+  button{border:none; padding:12px 18px; border-radius:14px; font-weight:800; font-size:15px; cursor:pointer; box-shadow:0 6px 16px rgba(255,105,155,.25);} 
+  .btn-primary{background:var(--btn-grad); color:#fff;} .btn-ghost{background:rgba(255,255,255,.8); color:#b3124a;}
+  .progress{margin-top:6px} .progress .bar{height:12px; border-radius:999px; background:#ffe6f1; overflow:hidden;} .progress .bar>i{display:block; height:100%; background:var(--accent-grad); width:0%; transition:width .25s ease;}
+  small.hint{color:var(--muted)}
+
+  /* 하단 고정 바 */
+  .dock{position:fixed; left:0; right:0; bottom:0; padding-bottom:calc(env(safe-area-inset-bottom) + 8px); display:flex; gap:12px; justify-content:center; align-items:center; height:var(--dock-h); background:rgba(255,255,255,.28); backdrop-filter:saturate(1.2) blur(14px); box-shadow:0 -8px 24px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.4); z-index:99;} 
+  .dock .dock-btn{min-width:110px; height:48px; padding:0 16px; border-radius:14px; font-weight:900; font-size:15px; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; color:#b3124a; border:1px solid rgba(0,0,0,.04); box-shadow:0 6px 18px rgba(0,0,0,.06); -webkit-tap-highlight-color:transparent;} 
+  .dock .primary{ background:linear-gradient(90deg,#ff6aa3,#ff2d6f); color:#fff; } .dock .ico{font-size:18px; line-height:1}
+  @media (max-width:390px){ .dock .dock-btn{ min-width:auto; padding:0 12px; font-size:14px; }}
+  .kb-pad{ padding-bottom:calc(var(--dock-h) + 24px); }
+
+  /* 미니 테스트 리포트 뱃지 */
+  .test-badge{position:fixed; right:10px; bottom:calc(var(--dock-h) + 20px); background:#111; color:#fff; font-size:12px; padding:6px 8px; border-radius:10px; opacity:.85; display:none;}
+</style>
+</head>
+
+<body>
+  <header class="title-wrap">
+    <div class="navbar">반석이네 가족 여행</div>
+    <div class="subtitle">오키나와 🇯🇵 · 방콕 🇹🇭 — 온라인/오프라인 저장 & 동기화</div>
+  </header>
+
+  <!-- 프로필 -->
+  <section class="profile">
+    <div class="profile-card">
+      <div class="profile-cover"></div>
+      <div class="profile-row">
+        <div class="avatar" aria-label="프로필 아이콘"></div>
+        <div class="pmeta">
+          <div class="pname">권유빈</div>
+          <div class="pdesc">8월23 ~ 8월 30 · 가족 여행</div>
+          <div class="ptags">
+            <span class="ptag">오키나와 🇯🇵</span>
+            <span class="ptag">방콕 🇹🇭</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container kb-pad">
+    <!-- 진행률 카드 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🎯</span>진행률</div>
+      <div class="progress"><div class="bar"><i id="overallBar"></i></div></div>
+      <small class="hint" id="saveStatus"></small>
+    </div>
+
+    <!-- 1. 환율 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">💱</span>1) 환율 계산 퀴즈</div>
+      <div class="row2">
+        <input id="fxJPY" placeholder="10,000원 → ■ 엔 (JPY)"/>
+        <input id="fxTHB" placeholder="10,000원 → ■ 바트 (THB)"/>
+      </div>
+      <div class="field"><input id="fxBonus" placeholder="보너스: 500엔 ≈ ■ 바트"/></div>
+      <div class="field"><input id="fxStarKRW" placeholder="⭐ 추가문제: 500바트는 한국돈으로?(KRW)"/></div>
+      <button class="btn-primary" data-sec="1">확정(저장)</button>
+    </div>
+
+    <!-- 2. 전기 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🔌</span>2) 전기 플러그 & 전압</div>
+      <div class="row2">
+        <input id="plugJP" placeholder="일본: 플러그 타입 / 전압"/>
+        <input id="plugTH" placeholder="태국: 플러그 타입 / 전압"/>
+      </div>
+      <div class="field"><input id="plugMe" placeholder="내 충전기 호환 여부(예: 100–240V)"/></div>
+      <button class="btn-primary" data-sec="2">확정(저장)</button>
+    </div>
+
+    <!-- 3. 날씨 & 옷차림 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🌦️</span>3) 날씨 & 옷차림</div>
+      <div class="row2">
+        <input id="wxOKA" placeholder="오키나와: 최저/최고/강수"/>
+        <input id="wxBKK" placeholder="방콕: 최저/최고/강수"/>
+      </div>
+      <div class="field"><textarea id="outfit" placeholder="옷차림/아이템 (반팔, 가디건, 슬리퍼, 우산, 모자, 선크림 등)"></textarea></div>
+      <button class="btn-primary" data-sec="3">확정(저장)</button>
+    </div>
+
+    <!-- 4. 회화 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🗣️</span>4) 간단 회화 카드</div>
+      <div class="field"><textarea id="jpPhrases" placeholder="일본어 메모 (감사합니다 / 얼마예요? / 맛있어요 + 발음)"></textarea></div>
+      <div class="field"><textarea id="thPhrases" placeholder="태국어 메모 (감사합니다 / 얼마예요? / 맛있어요 + 발음)"></textarea></div>
+      <button class="btn-primary" data-sec="4">확정(저장)</button>
+    </div>
+
+    <!-- 5. 편의점 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🛒</span>5) 편의점 필수템</div>
+      <div class="field"><textarea id="cOKA" placeholder="오키나와 편의점 베스트 3 + 가격"></textarea></div>
+      <div class="field"><textarea id="cBKK" placeholder="방콕 편의점 베스트 3 + 가격"></textarea></div>
+      <button class="btn-primary" data-sec="5">확정(저장)</button>
+    </div>
+
+    <!-- 비상연락망 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">🆘</span>비상연락망</div>
+      <div style="display:grid;gap:8px">
+        <div><strong>오키나와(관할: 주후쿠오카 총영사관)</strong><br/>
+          대표전화: <a href="tel:+81927710461">+81-92-771-0461</a>~2 · 긴급(야간/휴일): <a href="tel:+818085882806">+81-80-8588-2806</a>
+        </div>
+        <div><strong>방콕(주태국 대한민국 대사관)</strong><br/>
+          대표전화: <a href="tel:+6624816000">+66-2-481-6000</a> · 긴급(근무시간 외): <a href="tel:+66819145803">+66-81-914-5803</a>
+        </div>
+      </div>
+      <small class="hint">* 현지 통신사/요금에 따라 통화료가 부과될 수 있어요.</small>
+    </div>
+
+    <!-- 6. 마지막 메모장 -->
+    <div class="card">
+      <div class="sec-title"><span class="ico">📝</span>6) 마지막 메모장</div>
+      <div class="field"><textarea id="memo6" placeholder="여행 마지막 점검 메모(환전, 여권, 탑승권, 약, 충전기, 선물 등)"></textarea></div>
+      <button class="btn-primary" data-sec="6">확정(저장)</button>
+    </div>
+  </div>
+
+  <!-- 하단 바 -->
+  <nav class="dock" role="toolbar" aria-label="빠른 실행">
+    <button class="dock-btn" id="btnRefresh" aria-label="새로고침"><span class="ico">🔄</span> 새로고침</button>
+    <button class="dock-btn primary" id="btnQuickSave" aria-label="저장하기"><span class="ico">💾</span> 저장하기</button>
+    <button class="dock-btn" id="btnTop" aria-label="맨 위로"><span class="ico">🏠</span> 맨위로</button>
+  </nav>
+
+  <div class="test-badge" id="testBadge">self-test: waiting</div>
+
+  <!-- Firebase (Compat CDN) + Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ===== 공용 헬퍼 =====
+    const $ = (id) => document.getElementById(id);
+    const statusNote = $('saveStatus');
+
+    // 진행률 계산
+    function updateProgress(){
+      const bar = $('overallBar');
+      if(!bar) return; // 방어코드
+      const checks = [
+        true,
+        $('fxJPY')?.value && $('fxTHB')?.value,
+        $('plugJP')?.value && $('plugTH')?.value && $('plugMe')?.value,
+        $('wxOKA')?.value && $('wxBKK')?.value && $('outfit')?.value,
+        $('jpPhrases')?.value && $('thPhrases')?.value,
+        $('cOKA')?.value && $('cBKK')?.value,
+        $('fxStarKRW')?.value,
+        $('memo6')?.value
+      ];
+      const filled = checks.filter(Boolean).length;
+      const pct = Math.round(filled / checks.length * 100);
+      bar.style.width = pct + '%';
+      return pct;
+    }
+
+    // 입력 변화 시 항상 갱신
+    document.addEventListener('input', (e)=>{
+      if(e.target.matches('input, textarea')) updateProgress();
+    });
+
+    // ===== Firebase 초기화 =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyBu2rTUwtREkmXicazOXq9D7I6uBQOz87U",
+      authDomain: "my-memo-90e91.firebaseapp.com",
+      projectId: "my-memo-90e91",
+      storageBucket: "my-memo-90e91.firebasestorage.app",
+      messagingSenderId: "752429576474",
+      appId: "1:752429576474:web:2afc83b95a8af5110c7ca3"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    db.enablePersistence({ synchronizeTabs: true }).catch(()=>{});
+
+    let uid = null; let docRef = null; // users/{uid}/pretrip/data
+
+    async function saveMerge(obj){
+      if(!docRef) throw new Error('로그인 전');
+      await docRef.set(obj, { merge: true });
+      if(statusNote){ statusNote.textContent = '저장됨 ✓'; setTimeout(()=> statusNote.textContent = '', 1200); }
+      if (navigator.vibrate) navigator.vibrate(15);
+    }
+
+    async function quickSaveAll(){
+      try{
+        await saveMerge({
+          sec1:{ fxJPY:$('fxJPY').value.trim(), fxTHB:$('fxTHB').value.trim(), fxBonus:$('fxBonus').value.trim(), fxStarKRW:$('fxStarKRW').value.trim() },
+          sec2:{ plugJP:$('plugJP').value.trim(), plugTH:$('plugTH').value.trim(), plugMe:$('plugMe').value.trim() },
+          sec3:{ wxOKA:$('wxOKA').value.trim(), wxBKK:$('wxBKK').value.trim(), outfit:$('outfit').value.trim() },
+          sec4:{ jpPhrases:$('jpPhrases').value.trim(), thPhrases:$('thPhrases').value.trim() },
+          sec5:{ cOKA:$('cOKA').value.trim(), cBKK:$('cBKK').value.trim() },
+          sec6:{ memo:$('memo6').value.trim() },
+          updatedAt: Date.now()
+        });
+        updateProgress();
+      }catch(e){ alert('저장 오류: '+(e?.message||e)); }
+    }
+
+    function bindSectionButtons(){
+      document.querySelectorAll('button[data-sec]').forEach(btn=>{
+        btn.addEventListener('click', async ()=>{
+          const sec = Number(btn.dataset.sec);
+          try{
+            if(sec===1){ await saveMerge({ sec1:{ fxJPY:$('fxJPY').value.trim(), fxTHB:$('fxTHB').value.trim(), fxBonus:$('fxBonus').value.trim(), fxStarKRW:$('fxStarKRW').value.trim() }, updatedAt:Date.now() }); }
+            if(sec===2){ await saveMerge({ sec2:{ plugJP:$('plugJP').value.trim(), plugTH:$('plugTH').value.trim(), plugMe:$('plugMe').value.trim() }, updatedAt:Date.now() }); }
+            if(sec===3){ await saveMerge({ sec3:{ wxOKA:$('wxOKA').value.trim(), wxBKK:$('wxBKK').value.trim(), outfit:$('outfit').value.trim() }, updatedAt:Date.now() }); }
+            if(sec===4){ await saveMerge({ sec4:{ jpPhrases:$('jpPhrases').value.trim(), thPhrases:$('thPhrases').value.trim() }, updatedAt:Date.now() }); }
+            if(sec===5){ await saveMerge({ sec5:{ cOKA:$('cOKA').value.trim(), cBKK:$('cBKK').value.trim() }, updatedAt:Date.now() }); }
+            if(sec===6){ await saveMerge({ sec6:{ memo:$('memo6').value.trim() }, updatedAt:Date.now() }); }
+            updateProgress();
+          } catch(e) {
+            alert('저장 오류: ' + (e?.message || e));
+          }
+        });
+      });
+    }
+
+    // 실시간 반영
+    function hydrate(data){
+      if(!data) return; 
+      if(data.sec1?.fxJPY) $('fxJPY').value = data.sec1.fxJPY;
+      if(data.sec1?.fxTHB) $('fxTHB').value = data.sec1.fxTHB;
+      if(data.sec1?.fxBonus) $('fxBonus').value = data.sec1.fxBonus;
+      if(data.sec1?.fxStarKRW) $('fxStarKRW').value = data.sec1.fxStarKRW;
+      if(data.sec2?.plugJP) $('plugJP').value = data.sec2.plugJP;
+      if(data.sec2?.plugTH) $('plugTH').value = data.sec2.plugTH;
+      if(data.sec2?.plugMe) $('plugMe').value = data.sec2.plugMe;
+      if(data.sec3?.wxOKA) $('wxOKA').value = data.sec3.wxOKA;
+      if(data.sec3?.wxBKK) $('wxBKK').value = data.sec3.wxBKK;
+      if(data.sec3?.outfit) $('outfit').value = data.sec3.outfit;
+      if(data.sec4?.jpPhrases) $('jpPhrases').value = data.sec4.jpPhrases;
+      if(data.sec4?.thPhrases) $('thPhrases').value = data.sec4.thPhrases;
+      if(data.sec5?.cOKA) $('cOKA').value = data.sec5.cOKA;
+      if(data.sec5?.cBKK) $('cBKK').value = data.sec5.cBKK;
+      if(data.sec6?.memo) $('memo6').value = data.sec6.memo;
+      updateProgress();
+    }
+
+    // 시작: 로그인 → 구독 → 버튼 바인딩
+    (async function start(){
+      try{
+        const cred = await auth.signInAnonymously();
+        uid = cred.user.uid;
+        docRef = db.collection('users').doc(uid).collection('pretrip').doc('data');
+        docRef.onSnapshot(snap => hydrate(snap.data()));
+        bindSectionButtons();
+      } catch(e) { alert('초기화 오류: ' + (e?.message || e)); }
+    })();
+
+    // 하단 바 동작
+    $('btnRefresh')?.addEventListener('click', ()=> location.reload());
+    $('btnQuickSave')?.addEventListener('click', quickSaveAll);
+    $('btnTop')?.addEventListener('click', ()=> { window.scrollTo({ top:0, behavior:'smooth' }); if (navigator.vibrate) navigator.vibrate(10); });
+
+    // 서비스 워커 등록
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+    }
+
+    // iOS 키보드 보정
+    if (window.visualViewport) {
+      const vv = window.visualViewport; const body = document.body;
+      const adjust = ()=>{ const kbOpen = window.innerHeight - vv.height > 120; body.style.paddingBottom = kbOpen ? 'calc(var(--dock-h) + 280px)' : 'calc(var(--dock-h) + env(safe-area-inset-bottom) + 12px)'; };
+      vv.addEventListener('resize', adjust); vv.addEventListener('scroll', adjust);
+    }
+
+   
+  </script>
+</body>
+</html>
